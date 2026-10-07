@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useLocation } from "wouter";
-import "./technicianLogin.css";
+import "./TechnicianLogin.css";
 
 const TechnicianLogin = () => {
   const [, navigate] = useLocation();
