@@ -164,7 +164,7 @@ function Home() {
     try {
       const token = localStorage.getItem('userToken');
       if (!token) return;
-      const response = await fetch('http://localhost:5000/api/bookings/my-bookings', {
+      const response = await fetch('${import.meta.env.VITE_API_URL}/api/bookings/my-bookings', {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
       if (response.ok) setBookings(await response.json());
@@ -183,7 +183,7 @@ function Home() {
   const completedAll     = bookings.filter(b => b.status === 'Completed');
 
   const handleLogout = async () => {
-    await fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' });
+    await fetch('${import.meta.env.VITE_API_URL}/api/auth/logout', { method: 'POST', credentials: 'include' });
     localStorage.removeItem('userToken');
     navigate('/');
     window.location.reload();

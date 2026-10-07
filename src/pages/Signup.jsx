@@ -32,7 +32,7 @@ function Signup() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      const response = await fetch('${import.meta.env.VITE_API_URL}/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ function Signup() {
     } catch (error) {
       console.error('Signup error:', error);
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        setError('Cannot connect to server. Please make sure the backend server is running on http://localhost:5000');
+        setError('Cannot connect to server. Please make sure the backend server is running on ${import.meta.env.VITE_API_URL}');
       } else {
         setError('Network error. Please try again.');
       }

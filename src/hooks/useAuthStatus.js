@@ -10,7 +10,7 @@ export function useAuthStatus() {
     queryFn: async () => {
       if (!token) return null;
       try {
-        const { data } = await axios.get("http://localhost:5000/api/auth/user", {
+        const { data } = await axios.get("${import.meta.env.VITE_API_URL}/api/auth/user", {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`

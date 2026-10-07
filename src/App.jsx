@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
     queries: {
       queryFn: async ({ queryKey }) => {
         const endpoint = queryKey[0];
-        const { data } = await axios.get(`http://localhost:5000${endpoint}`, {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}${endpoint}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("techToken") || ""}`
           }
@@ -47,7 +47,7 @@ function useAuth() {
     queryFn: async () => {
       if (!token) return null;
       try {
-        const { data } = await axios.get("http://localhost:5000/api/auth/user", {
+        const { data } = await axios.get("${import.meta.env.VITE_API_URL}/api/auth/user", {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` }
         });

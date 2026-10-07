@@ -28,7 +28,7 @@ function TechnicianDashboard() {
     try {
       setLoading(true);
       const token = localStorage.getItem("techToken");
-      const res = await axios.get("http://localhost:5000/api/technician/bookings", {
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/technician/bookings", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBookings(res.data || []);
@@ -53,7 +53,7 @@ function TechnicianDashboard() {
     try {
       const token = localStorage.getItem("techToken");
       await axios.patch(
-        `http://localhost:5000/api/technician/bookings/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/technician/bookings/${id}`,
         { status: "Completed" },
         { headers: { Authorization: `Bearer ${token}` } }
       );

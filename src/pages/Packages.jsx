@@ -60,7 +60,7 @@ function Packages() {
                   </Link>
                   <button 
                     onClick={async () => {
-                      await fetch('http://localhost:5000/api/auth/logout', { 
+                      await fetch('${import.meta.env.VITE_API_URL}/api/auth/logout', { 
                         method: 'POST',
                         credentials: 'include'
                       })

@@ -16,7 +16,7 @@ const TechnicianProtected = ({ children }) => {
     // Validate token with your backend API
     const validateToken = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/technician/validate", {
+        const response = await fetch("${import.meta.env.VITE_API_URL}/api/technician/validate", {
           method: "GET",
           headers: { 
             "Authorization": `Bearer ${token}`,
