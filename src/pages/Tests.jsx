@@ -8,22 +8,32 @@ function Tests() {
   const [searchTerm, setSearchTerm] = useState('')
   const { isAuthenticated, isLoading: authLoading } = useAuthStatus()
   
+  // 1. Added queryFn to perform the actual HTTP fetch request
   const { data: tests = [], isLoading } = useQuery({
-    queryKey: ['/api/tests'],
+    queryKey: ['tests'],
+    queryFn: async () => {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${baseUrl}/api/tests`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch tests')
+      }
+      return response.json()
+    }
   })
 
-  const filteredTests = tests.filter(test =>
-    test.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // Safe filtering check in case test objects or names are missing
+  const filteredTests = Array.isArray(tests)
+    ? tests.filter(test =>
+        test.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : []
 
   const handleBookTest = (test) => {
     if (!isAuthenticated) {
-      // Store selected test and redirect to login
       localStorage.setItem('selectedTest', JSON.stringify(test))
       navigate('/login')
       return
     }
-    // Store selected test in localStorage and navigate to book home visit
     localStorage.setItem('selectedTest', JSON.stringify(test))
     navigate('/book-home-visit')
   }
@@ -59,7 +69,9 @@ function Tests() {
                   </Link>
                   <button 
                     onClick={async () => {
-                      await fetch('${import.meta.env.VITE_API_URL}/api/auth/logout', { 
+                      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+                      // 2. Changed single quotes to backticks for proper string interpolation
+                      await fetch(`${baseUrl}/api/auth/logout`, { 
                         method: 'POST',
                         credentials: 'include'
                       })
@@ -114,7 +126,8 @@ function Tests() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTests.length > 0 ? (
               filteredTests.map((test) => (
-                <div key={test.id} className="bg-white p-6 rounded-lg shadow-md">
+                // 3. Fallback to test._id for MongoDB collections
+                <div key={test._id || test.id} className="bg-white p-6 rounded-lg shadow-md">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{test.name}</h3>
                   <p className="text-gray-600 mb-4">{test.description}</p>
                   <div className="flex justify-between items-center">

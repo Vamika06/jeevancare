@@ -7,9 +7,18 @@ function Packages() {
   const [, navigate] = useLocation()
   const [searchTerm, setSearchTerm] = useState('')
   const { isAuthenticated } = useAuthStatus()
-  
+
+  // FIX: Added queryFn to fetch data from live backend
   const { data: packages = [], isLoading } = useQuery({
-    queryKey: ['/api/packages'],
+    queryKey: ['packages'],
+    queryFn: async () => {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${baseUrl}/api/packages`)
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      return response.json()
+    }
   })
 
   const filteredPackages = packages.filter(pkg =>
@@ -18,12 +27,10 @@ function Packages() {
 
   const handleBookPackage = (pkg) => {
     if (!isAuthenticated) {
-      // Store selected package and redirect to login
       localStorage.setItem('selectedPackage', JSON.stringify(pkg))
       navigate('/login')
       return
     }
-    // Store selected package and navigate to book home visit
     localStorage.setItem('selectedPackage', JSON.stringify(pkg))
     localStorage.setItem('selectedTest', JSON.stringify({ name: pkg.name, price: pkg.price }))
     navigate('/book-home-visit')
@@ -60,7 +67,9 @@ function Packages() {
                   </Link>
                   <button 
                     onClick={async () => {
-                      await fetch('${import.meta.env.VITE_API_URL}/api/auth/logout', { 
+                      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+                      // FIX: Replaced single quotes with backticks so VITE_API_URL interpolates properly
+                      await fetch(`${baseUrl}/api/auth/logout`, { 
                         method: 'POST',
                         credentials: 'include'
                       })
@@ -115,11 +124,11 @@ function Packages() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPackages.length > 0 ? (
               filteredPackages.map((pkg) => (
-                <div key={pkg.id} className="bg-white p-6 rounded-lg shadow-md">
+                <div key={pkg._id || pkg.id} className="bg-white p-6 rounded-lg shadow-md">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{pkg.name}</h3>
                   <p className="text-gray-600 mb-4">{pkg.description}</p>
                   <div className="mb-4">
-                    <span className="text-sm text-gray-500">Includes {pkg.testCount} tests</span>
+                    <span className="text-sm text-gray-500">Includes {pkg.testCount || (pkg.tests && pkg.tests.length) || 0} tests</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-green-600">₹{pkg.price}</span>
